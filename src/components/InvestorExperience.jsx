@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getFirestore, doc, updateDoc, serverTimestamp, setDoc, getDoc } from 'firebase/firestore';
 import { auth } from '../../firebase';
-import { detectTimezone } from '../../utils/timezone';
+import { detectTimezone } from '../utils/timezone';
 import TimezoneSettings from './TimezoneSettings';
 
 function ParticleField() {
