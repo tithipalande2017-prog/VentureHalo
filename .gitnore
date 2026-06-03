@@ -1,0 +1,27 @@
+venture-halo-firebase-adminsdk-fbsvc-f2c702fee9.json
+git filter-branch --force --index-filter \
+"git rm --cached --ignore-unmatch venture-halo-firebase-adminsdk-fbsvc-f2c702fee9.json" \
+--prune-empty --tag-name-filter cat -- --all
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Firebase
+backend/serviceAccountKey.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
