@@ -594,80 +594,6 @@ function MeetingScheduler({ startup, selectedDate, onSelectDate, selectedSlot, o
   );
 }
 
-const mockStartups = [
-  {
-    id: 1,
-    name: 'HelioForge',
-    founder: 'Sarah Chen',
-    pitch: 'Adaptive capital intelligence for frontier founders.',
-    industry: 'Deep Tech',
-    stage: 'Series A',
-    fundingGoal: '$18M',
-    users: '2,400',
-    growth: '145%',
-    interest: 24,
-  },
-  {
-    id: 2,
-    name: 'AuraSphere',
-    founder: 'Marcus Wei',
-    pitch: 'AI-curated investor networks with real-time signal flow.',
-    industry: 'Investor Intelligence',
-    stage: 'Seed',
-    fundingGoal: '$4.2M',
-    users: '890',
-    growth: '234%',
-    interest: 18,
-  },
-  {
-    id: 3,
-    name: 'Nexus Cove',
-    founder: 'Priya Sharma',
-    pitch: 'Premium deal discovery for founders with traction.',
-    industry: 'Marketplace',
-    stage: 'Growth',
-    fundingGoal: '$27M',
-    users: '15,600',
-    growth: '89%',
-    interest: 42,
-  },
-  {
-    id: 4,
-    name: 'Lumen Vault',
-    founder: 'Alex Rodriguez',
-    pitch: 'Cohort-backed risk insights for strategic capital.',
-    industry: 'Climate Tech',
-    stage: 'Pre-Series A',
-    fundingGoal: '$7.4M',
-    users: '1,200',
-    growth: '178%',
-    interest: 15,
-  },
-  {
-    id: 5,
-    name: 'Quantum Labs',
-    founder: 'Dr. Emily Park',
-    pitch: 'Enterprise security through quantum-resistant cryptography.',
-    industry: 'Deep Tech',
-    stage: 'Series A',
-    fundingGoal: '$12M',
-    users: '450',
-    growth: '567%',
-    interest: 31,
-  },
-  {
-    id: 6,
-    name: 'ChainHealth',
-    founder: 'James Morrison',
-    pitch: 'Decentralized healthcare records for patient empowerment.',
-    industry: 'HealthTech',
-    stage: 'Seed',
-    fundingGoal: '$3.8M',
-    users: '2,100',
-    growth: '321%',
-    interest: 22,
-  },
-];
 
 function StartupCard({ startup, onViewProfile }) {
   return (
@@ -1120,12 +1046,33 @@ export default function InvestorExperience({ user }) {
   const [meetingNotes, setMeetingNotes] = useState('Review traction, runway, and growth milestones.');
 
   const filteredStartups = useMemo(() => {
-    return mockStartups.filter((startup) => {
-      if (filters.industry !== 'All' && startup.industry !== filters.industry) return false;
-      if (filters.stage !== 'All' && startup.stage !== filters.stage) return false;
-      return true;
-    });
-  }, [filters]);
+    // Extract unique startups from meetings
+    const startupMap = new Map();
+    if (Array.isArray(meetings)) {
+      meetings.forEach((meeting) => {
+        if (meeting.participants && meeting.participants.length > 0) {
+          const founderName = meeting.participants[0];
+          const startupName = meeting.title?.split(' x ')[0] || founderName;
+          
+          if (!startupMap.has(startupName)) {
+            startupMap.set(startupName, {
+              id: meeting.id,
+              name: startupName,
+              founder: founderName,
+              pitch: meeting.title || '',
+              industry: 'All',
+              stage: 'All',
+              fundingGoal: '',
+              users: '',
+              growth: '',
+              interest: 0,
+            });
+          }
+        }
+      });
+    }
+    return Array.from(startupMap.values());
+  }, [meetings]);
 
   const handleFilterChange = (filterType, value) => {
     setFilters((prev) => ({ ...prev, [filterType]: value }));
