@@ -9,6 +9,7 @@ package-lock.json
 
 # Firebase
 backend/serviceAccountKey.json
+backend/serviceAccountKey.env.json
 
 # Logs
 *.log
