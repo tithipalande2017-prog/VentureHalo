@@ -38,9 +38,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Handle preflight requests
-app.options('*', cors());
-
 // Global timeout middleware (60 seconds)
 app.use((req, res, next) => {
   res.setTimeout(60000, () => {
