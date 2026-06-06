@@ -18,7 +18,10 @@ try {
 } catch (error) {
   console.error("\n========================================================");
   console.error("CRITICAL ERROR: Failed to initialize Firebase Admin SDK!");
-  console.error("Please ensure backend/serviceAccountKey.json is a valid service account credentials file.");
+  console.error("Please ensure environment variables are set:");
+  console.error("  - FIREBASE_PROJECT_ID");
+  console.error("  - FIREBASE_CLIENT_EMAIL");
+  console.error("  - FIREBASE_PRIVATE_KEY");
   console.error("Error details:", error.stack || error.message);
   console.error("========================================================\n");
   process.exit(1); // Graceful termination on invalid credentials
@@ -29,12 +32,30 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Global Middlewares
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins for development and Render deployment
+  credentials: true
+}));
 app.use(express.json());
+
+// Handle preflight requests
+app.options('*', cors());
+
+// Global timeout middleware (60 seconds)
+app.use((req, res, next) => {
+  res.setTimeout(60000, () => {
+    console.error('[Server] Request timeout:', req.method, req.url);
+    res.status(504).json({
+      success: false,
+      message: 'Request timeout - server took too long to respond'
+    });
+  });
+  next();
+});
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`[Server] ${req.method} ${req.url}`);
+  console.log(`[Server] HIT: ${req.method} ${req.url}`);
   console.log(`[Server] Query params:`, req.query);
   console.log(`[Server] Body:`, req.body);
   next();
@@ -42,8 +63,15 @@ app.use((req, res, next) => {
 
 // API Endpoints
 
+// Health check route
+app.get("/health", (req, res) => {
+  console.log("[Health] Health check requested");
+  res.status(200).send("OK");
+});
+
 // A. POST /create-meeting
 app.post("/create-meeting", async (req, res) => {
+  console.log("[Route] POST /create-meeting");
   try {
     const { title, time, participants, uid, founderId, investorId, timezone } = req.body;
 
@@ -132,6 +160,7 @@ app.post("/create-meeting", async (req, res) => {
 
 // B. GET /meetings
 app.get("/meetings", async (req, res) => {
+  console.log("[Route] GET /meetings");
   try {
     console.log("[Meetings] Loading meetings...");
     const { uid, role } = req.query;
@@ -265,6 +294,7 @@ app.get("/meetings", async (req, res) => {
 
 // D. GET /notifications
 app.get("/notifications", async (req, res) => {
+  console.log("[Route] GET /notifications");
   try {
     const { uid } = req.query;
     if (!uid) {
@@ -321,6 +351,7 @@ app.get("/notifications", async (req, res) => {
 
 // E. POST /mark-notification-read
 app.post("/mark-notification-read", async (req, res) => {
+  console.log("[Route] POST /mark-notification-read");
   try {
     const { notificationId } = req.body;
 
@@ -355,6 +386,7 @@ app.post("/mark-notification-read", async (req, res) => {
 
 // C. POST /reschedule-meeting
 app.post("/reschedule-meeting", async (req, res) => {
+  console.log("[Route] POST /reschedule-meeting");
   try {
     const { meetingId, uid, newTime, rescheduleMessage } = req.body;
 
@@ -478,6 +510,7 @@ app.post("/reschedule-meeting", async (req, res) => {
 
 // D. POST /cancel-meeting
 app.post("/cancel-meeting", async (req, res) => {
+  console.log("[Route] POST /cancel-meeting");
   try {
     const { meetingId, uid, cancellationMessage } = req.body;
 
