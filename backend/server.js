@@ -55,6 +55,14 @@ app.use((req, res, next) => {
   console.log(`[Server] HIT: ${req.method} ${req.url}`);
   console.log(`[Server] Query params:`, req.query);
   console.log(`[Server] Body:`, req.body);
+  
+  // Log response
+  const originalSend = res.send;
+  res.send = function(data) {
+    console.log(`[Server] RESPONSE: ${res.statusCode}`, data);
+    originalSend.call(this, data);
+  };
+  
   next();
 });
 
@@ -66,8 +74,8 @@ app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
 
-// A. POST /create-meeting
-app.post("/create-meeting", async (req, res) => {
+// A. POST /api/create-meeting
+app.post("/api/create-meeting", async (req, res) => {
   console.log("[Route] POST /create-meeting");
   try {
     const { title, time, participants, uid, founderId, investorId, timezone } = req.body;
@@ -155,8 +163,8 @@ app.post("/create-meeting", async (req, res) => {
   }
 });
 
-// B. GET /meetings
-app.get("/meetings", async (req, res) => {
+// B. GET /api/meetings
+app.get("/api/meetings", async (req, res) => {
   console.log("[Route] GET /meetings");
   try {
     console.log("[Meetings] Loading meetings...");
@@ -289,8 +297,8 @@ app.get("/meetings", async (req, res) => {
   }
 });
 
-// D. GET /notifications
-app.get("/notifications", async (req, res) => {
+// D. GET /api/notifications
+app.get("/api/notifications", async (req, res) => {
   console.log("[Route] GET /notifications");
   try {
     const { uid } = req.query;
@@ -346,8 +354,8 @@ app.get("/notifications", async (req, res) => {
   }
 });
 
-// E. POST /mark-notification-read
-app.post("/mark-notification-read", async (req, res) => {
+// E. POST /api/mark-notification-read
+app.post("/api/mark-notification-read", async (req, res) => {
   console.log("[Route] POST /mark-notification-read");
   try {
     const { notificationId } = req.body;
@@ -381,8 +389,8 @@ app.post("/mark-notification-read", async (req, res) => {
   }
 });
 
-// C. POST /reschedule-meeting
-app.post("/reschedule-meeting", async (req, res) => {
+// C. POST /api/reschedule-meeting
+app.post("/api/reschedule-meeting", async (req, res) => {
   console.log("[Route] POST /reschedule-meeting");
   try {
     const { meetingId, uid, newTime, rescheduleMessage } = req.body;
@@ -505,8 +513,8 @@ app.post("/reschedule-meeting", async (req, res) => {
   }
 });
 
-// D. POST /cancel-meeting
-app.post("/cancel-meeting", async (req, res) => {
+// D. POST /api/cancel-meeting
+app.post("/api/cancel-meeting", async (req, res) => {
   console.log("[Route] POST /cancel-meeting");
   try {
     const { meetingId, uid, cancellationMessage } = req.body;
