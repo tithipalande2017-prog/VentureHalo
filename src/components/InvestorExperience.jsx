@@ -45,7 +45,7 @@ function ParticleField() {
 
 const MEETINGS_STORAGE_KEY = 'meetings';
 const INVESTOR_NAME = 'Venture Halo Capital';
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 function loadMeetings() {
   return [];
