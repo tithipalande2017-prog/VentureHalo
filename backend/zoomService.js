@@ -33,6 +33,11 @@ async function generateZoomMeeting() {
   try {
     // 1. Get access token
     console.log("[Zoom] Requesting access token from https://zoom.us/oauth/token");
+    
+    // Add AbortController for timeout handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
     const tokenResponse = await fetch(
       `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=${process.env.ZOOM_ACCOUNT_ID}`,
       {
@@ -40,8 +45,11 @@ async function generateZoomMeeting() {
         headers: {
           Authorization: `Basic ${authHeader}`,
         },
+        signal: controller.signal
       }
     );
+    
+    clearTimeout(timeoutId);
 
     console.log("[Zoom] Access token response status:", tokenResponse.status);
 
@@ -82,6 +90,10 @@ async function generateZoomMeeting() {
     console.log("[Zoom] Request payload:", JSON.stringify(meetingRequestBody));
     console.log("[Zoom] Using bearer token (first 10 chars):", access_token.substring(0, 10) + "...");
 
+    // Add AbortController for timeout handling
+    const meetingController = new AbortController();
+    const meetingTimeoutId = setTimeout(() => meetingController.abort(), 30000); // 30 second timeout
+
     const meetingResponse = await fetch(
       "https://api.zoom.us/v2/users/me/meetings",
       {
@@ -91,8 +103,11 @@ async function generateZoomMeeting() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(meetingRequestBody),
+        signal: meetingController.signal
       }
     );
+    
+    clearTimeout(meetingTimeoutId);
 
     console.log("[Zoom] Meeting creation response status:", meetingResponse.status);
 
