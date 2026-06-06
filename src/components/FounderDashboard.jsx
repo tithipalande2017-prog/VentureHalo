@@ -44,6 +44,7 @@ function ParticleField() {
 }
 
 const MEETINGS_STORAGE_KEY = 'meetings';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
 function loadMeetings() {
   return [];
@@ -828,7 +829,7 @@ export default function FounderDashboard({ surveyData, user }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/meetings?uid=${user.uid}&role=founder`);
+      const res = await fetch(`${API_BASE}/api/meetings?uid=${user.uid}&role=founder`);
       if (!res.ok) {
         throw new Error(`Failed to load meetings from database (Status ${res.status})`);
       }
@@ -859,7 +860,7 @@ export default function FounderDashboard({ surveyData, user }) {
     if (!meetingToCancel || !user?.uid) return;
 
     try {
-      const res = await fetch('/api/cancel-meeting', {
+      const res = await fetch(`${API_BASE}/api/cancel-meeting`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -925,7 +926,7 @@ export default function FounderDashboard({ surveyData, user }) {
       
       console.log("API Request Payload:", requestBody);
 
-      const res = await fetch('/api/reschedule-meeting', {
+      const res = await fetch(`${API_BASE}/api/reschedule-meeting`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -965,7 +966,7 @@ export default function FounderDashboard({ surveyData, user }) {
   const fetchNotifications = async () => {
     if (!user?.uid) return;
     try {
-      const res = await fetch(`/api/notifications?uid=${user.uid}`);
+      const res = await fetch(`${API_BASE}/api/notifications?uid=${user.uid}`);
       if (res.ok) {
         const data = await res.json();
         if (data.success && Array.isArray(data.notifications)) {
@@ -979,7 +980,7 @@ export default function FounderDashboard({ surveyData, user }) {
 
   const handleDismissNotification = async (notificationId) => {
     try {
-      const res = await fetch('/api/mark-notification-read', {
+      const res = await fetch(`${API_BASE}/api/mark-notification-read`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notificationId }),
@@ -1321,7 +1322,7 @@ export default function FounderDashboard({ surveyData, user }) {
                 setError(null);
 
                 try {
-                  const res = await fetch("/api/create-meeting", {
+                  const res = await fetch(`${API_BASE}/api/create-meeting`, {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
