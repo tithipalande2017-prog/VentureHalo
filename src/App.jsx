@@ -4,6 +4,7 @@ import FounderDashboard from './components/FounderDashboard';
 import RoleSelection from './components/RoleSelection';
 import InvestorExperience from './components/InvestorExperience';
 import LoginScreen from './components/LoginScreen';
+import TermsOfService from './components/TermsOfService';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase';
 import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
@@ -136,6 +137,7 @@ function App() {
   const [role, setRole] = useState(null);
   const [view, setView] = useState('landing');
   const [surveyData, setSurveyData] = useState(null);
+  const [showTerms, setShowTerms] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
@@ -187,6 +189,10 @@ function App() {
 
   if (role === 'investor') {
     return <InvestorExperience user={user} />;
+  }
+
+  if (showTerms) {
+    return <TermsOfService onBack={() => setShowTerms(false)} />;
   }
 
   return (
@@ -380,6 +386,7 @@ function App() {
               <a href="#discovery" className="transition hover:text-white">Discovery</a>
               <a href="#showcase" className="transition hover:text-white">Showcase</a>
               <a href="#vision" className="transition hover:text-white">Vision</a>
+              <button onClick={() => setShowTerms(true)} className="transition hover:text-white">Terms of Service</button>
             </div>
           </div>
         </footer>
